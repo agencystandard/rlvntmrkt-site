@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RLVNT MRKT</title>
+<meta name="description" content="Making something out of nothing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;1,6..96,400;1,6..96,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  *{box-sizing:border-box} body{margin:0}
+  /* Layout: one room. A single line of copy floats center-left on a field of blue; the visitor's cursor draws on the wall. */
+  :root {
+    --blue: #1d2fd8;        /* the wall */
+    --blue-deep: #14209e;   /* shadow of the wall */
+    --paper: #f3f1ea;       /* the words */
+    --paper-dim: rgba(243, 241, 234, 0.58);
+    --ink: rgba(243, 241, 234, 0.9); /* the marks visitors leave */
+    --display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body {
+    background: var(--blue);
+    color: var(--paper);
+    font-family: var(--mono);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--paper); color: var(--blue); }
+
+  body::after {
+    content: ""; position: fixed; inset: -50%; z-index: 2; pointer-events: none;
+    opacity: .16; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain .9s steps(4) infinite;
+  }
+  @keyframes grain { 0%{transform:translate(0,0)} 25%{transform:translate(-3%,2%)} 50%{transform:translate(2%,-3%)} 75%{transform:translate(-2%,-1%)} 100%{transform:translate(0,0)} }
+  #wall { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+
+  .room {
+    position: relative; z-index: 1;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding-left: max(20px, env(safe-area-inset-left, 0px));
+    padding-right: max(20px, env(safe-area-inset-right, 0px));
+    padding-block: 20px;
+    pointer-events: none;
+  }
+  .room a, .room button { pointer-events: auto; }
+
+  .bar {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .mark { font-weight: 500; }
+  .id { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .does { color: var(--paper-dim); font-size: 11px; letter-spacing: 0.1em; max-width: 60ch; }
+  .meta { color: var(--paper-dim); display: flex; gap: 18px; font-variant-numeric: tabular-nums; }
+
+  .stage {
+    align-self: center;
+    max-width: 15ch;
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(44px, 9.5vw, 128px);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin-left: clamp(0px, 4vw, 72px);
+  }
+  .line { transition: opacity .16s steps(3), transform .22s cubic-bezier(.7,0,.2,1); }
+  .line.leaving { opacity: 0; transform: translateX(-24px) skewX(-6deg); }
+  .line.entering { opacity: 0; transform: translateX(24px) skewX(6deg); }
+  .line .roman { font-style: normal; }
+
+  .contact {
+    margin-top: 28px;
+    font-family: var(--mono); font-style: normal; font-size: 15px; letter-spacing: 0.02em;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  }
+  .contact[hidden] { display: none !important; }
+  .email { user-select: all; border-bottom: 1px solid var(--paper-dim); padding-bottom: 2px; color: var(--paper); text-decoration: none; }
+
+  .foot {
+    display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap;
+    font-size: 11px; letter-spacing: 0.08em; color: var(--paper-dim);
+  }
+  .controls { display: flex; gap: 10px; align-items: center; }
+
+  button {
+    font: inherit; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--paper); background: transparent;
+    border: 1px solid var(--paper); border-radius: 999px;
+    padding: 10px 18px; cursor: pointer;
+    transition: background .2s, color .2s;
+  }
+  button:hover { background: var(--paper); color: var(--blue); }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+  button.quiet { border-color: transparent; color: var(--paper-dim); padding-inline: 8px; }
+  button.quiet:hover { background: transparent; color: var(--paper); }
+  .count { font-variant-numeric: tabular-nums; min-width: 4ch; }
+  .legal { white-space: nowrap; }
+  @media (max-width: 760px) { .legal { white-space: normal; } }
+
+  @media (max-width: 520px) {
+    .meta .tz { display: none; }
+    .stage { margin-left: 0; }
+    .foot { flex-direction: column-reverse; align-items: start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .line { transition: none; }
+    body::after { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="wall" aria-hidden="true"></canvas>
+
+<main class="room">
+  <header class="bar">
+    <span class="id"><span class="mark">RLVNT MRKT</span><span class="does">Brand. Strategy. Creative. Growth. AI Process. Whatever the idea needs.</span></span>
+    <span class="meta"><span class="tz">Los Angeles</span><span id="clock">--:--</span><span>∞</span></span>
+  </header>
+
+  <section class="stage" aria-live="polite">
+    <div class="line" id="line">Hi. I'm Niki.</div>
+    <div class="contact" id="contact" hidden>
+      <a class="email" id="email" href="mailto:niki@rlvntmrkt.com">niki@rlvntmrkt.com</a>
+      <button type="button" id="copy">Copy</button>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span class="legal">© Everything is made up. From the beginning of time, to the end of days.</span>
+    <span class="controls">
+      <span class="count" id="count">1 / 6</span>
+      <button type="button" class="quiet" id="back" aria-label="Previous line">←</button>
+      <button type="button" id="next">Go on</button>
+    </span>
+  </footer>
+</main>
+
+<script>
+(() => {
+  const lines = [
+    { t: "Hi. I'm Niki.", btn: "Go on" },
+    { t: "I make digital things for a living.", btn: "Okay" },
+    { t: "Ideas don't matter. Execution does.", btn: "Fair" },
+    { t: "I do a little bit of everything. Pretty darn well.", btn: "Bold" },
+    { t: "That's it. That's the website.", btn: "Rude" },
+    { t: "Got an idea? I'm listening.", btn: "Again", contact: true }
+  ];
+  let i = 0;
+  const lineEl = document.getElementById('line');
+  const nextBtn = document.getElementById('next');
+  const backBtn = document.getElementById('back');
+  const countEl = document.getElementById('count');
+  const contact = document.getElementById('contact');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function render() {
+    const L = lines[i];
+    lineEl.textContent = L.t;
+    nextBtn.textContent = L.btn;
+    countEl.textContent = (i + 1) + ' / ' + lines.length;
+    contact.hidden = !L.contact;
+    backBtn.style.visibility = i === 0 ? 'hidden' : 'visible';
+  }
+  function go(dir) {
+    const n = (i + dir + lines.length) % lines.length;
+    if (reduce) { i = n; render(); return; }
+    lineEl.classList.add('leaving');
+    setTimeout(() => {
+      i = n; render();
+      lineEl.classList.remove('leaving'); lineEl.classList.add('entering');
+      requestAnimationFrame(() => requestAnimationFrame(() => lineEl.classList.remove('entering')));
+    }, 150);
+  }
+  nextBtn.addEventListener('click', () => go(1));
+  backBtn.addEventListener('click', () => { if (i > 0) go(-1); });
+  addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { if (e.target.tagName !== 'BUTTON') { e.preventDefault(); go(1); } }
+    if (e.key === 'ArrowLeft' && i > 0) go(-1);
+  });
+  render();
+
+  // copy email
+  const copyBtn = document.getElementById('copy');
+  copyBtn.addEventListener('click', () => {
+    const done = () => { copyBtn.textContent = 'Copied'; setTimeout(() => copyBtn.textContent = 'Copy', 1600); };
+    const fallback = () => { const r = document.createRange(); r.selectNodeContents(document.getElementById('email')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+    try { navigator.clipboard.writeText('niki@rlvntmrkt.com').then(done, fallback); } catch (e) { fallback(); }
+  });
+
+  // clock, LA time
+  const clock = document.getElementById('clock');
+  const fmt = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles' });
+  const tick = () => clock.textContent = fmt.format(new Date());
+  tick(); setInterval(tick, 15000);
+
+  // the wall: cursor leaves a fading line
+  const c = document.getElementById('wall');
+  const ctx = c.getContext('2d');
+  let w, h, dpr;
+  function size() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    w = innerWidth; h = innerHeight;
+    c.width = w * dpr; c.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  size(); addEventListener('resize', size);
+
+  const pts = [];
+  const LIFE = reduce ? 9000 : 4200;
+  addEventListener('pointermove', e => {
+    pts.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+    if (pts.length > 600) pts.shift();
+  }, { passive: true });
+
+  // seed a faint scribble so the first frame isn't empty
+  (function seed() {
+    const now = performance.now();
+    for (let k = 0; k < 90; k++) {
+      const a = k / 90 * Math.PI * 2;
+      const r = 70 + 18 * Math.sin(a * 3);
+      pts.push({ x: w * 0.78 + Math.cos(a * 2) * r, y: h * 0.32 + Math.sin(a) * r, t: now - 2400 + k * 20 });
+    }
+  })();
+
+  function draw(now) {
+    ctx.clearRect(0, 0, w, h);
+    while (pts.length && now - pts[0].t > LIFE) pts.shift();
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (let k = 1; k < pts.length; k++) {
+      const a = pts[k - 1], b = pts[k];
+      if (Math.hypot(b.x - a.x, b.y - a.y) > 140) continue;
+      const life = 1 - (now - b.t) / LIFE;
+      ctx.strokeStyle = 'rgba(243,241,234,' + Math.min(1, life * 1.1).toFixed(3) + ')';
+      ctx.lineWidth = 1.5 + life * 3;
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
